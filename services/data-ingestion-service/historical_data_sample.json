@@ -1,0 +1,35 @@
+[
+  {
+    "company_symbol": "RELIANCE",
+    "trade_date": "2023-10-26",
+    "open_price": 2400.0,
+    "high_price": 2450.0,
+    "low_price": 2390.0,
+    "close_price": 2440.0,
+    "volume": 1000000,
+    "adjusted_close_price": 2440.0,
+    "currency": "INR"
+  },
+  {
+    "company_symbol": "RELIANCE",
+    "trade_date": "2023-10-27",
+    "open_price": 2450.0,
+    "high_price": 2480.0,
+    "low_price": 2430.0,
+    "close_price": 2470.0,
+    "volume": 1200000,
+    "adjusted_close_price": 2470.0,
+    "currency": "INR"
+  },
+  {
+    "company_symbol": "TCS",
+    "trade_date": "2023-10-26",
+    "open_price": 3500.0,
+    "high_price": 3550.0,
+    "low_price": 3480.0,
+    "close_price": 3540.0,
+    "volume": 500000,
+    "adjusted_close_price": 3540.0,
+    "currency": "INR"
+  }
+]

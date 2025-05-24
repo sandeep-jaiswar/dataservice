@@ -12,7 +12,8 @@ py_library(
         requirement("requests"),
         # Add dependencies for data processing (e.g., pandas if needed)
         # requirement("pandas"),
-        # Add any internal dependencies here, e.g., from pkgs
+        "//pkgs/data_models", # Depends on the data models
+        "//pkgs/database_client", # Depends on the database client
     ],
 )
 
@@ -23,6 +24,7 @@ py_binary(
     deps = [
         ":data-ingestion-service-lib",
     ],
+    data = ["historical_data_sample.json"], # Add the JSON file as a data dependency
 )
 
 # === Formatting (Black) ===
@@ -46,6 +48,28 @@ py_test(
     name = "nse_symbols_test",
     srcs = ["src/test/python/test_nse_symbols.py"],
     deps = [
-        ":data-ingestion-service-lib", # The test depends on the library it's testing
+        ":data-ingestion-service-lib",
+        "//pkgs/data_models",
     ],
+)
+
+py_test(
+    name = "historical_data_fetcher_test",
+    srcs = ["src/test/python/test_historical_data_fetcher.py"],
+    deps = [
+        ":data-ingestion-service-lib",
+        "//pkgs/data_models",
+    ],
+    data = ["historical_data_sample.json"], # The test also needs the JSON file
+)
+
+py_test(
+    name = "data_ingestion_database_integration_test",
+    srcs = ["src/test/python/integration_test.py"],
+    deps = [
+        ":data-ingestion-service-lib",
+        "//pkgs/database_client", # Depends on the database client
+        "//pkgs/data_models", # Depends on data models
+    ],
+    data = ["historical_data_sample.json"], # The test needs the JSON file
 )

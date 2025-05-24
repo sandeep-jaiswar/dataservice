@@ -42,7 +42,8 @@ checkstyle_java_lint(
     name = "lint",
     srcs = glob(["src/main/java/**/*.java"]),
     checkstyle = artifact("com.puppycrawl.tools:checkstyle"),
-    config = "//:checkstyle.xml", # Uncommented and configured
+    # Reference the Google checks configuration within the checkstyle artifact
+    config = artifact("com.puppycrawl.tools:checkstyle", path = "google_checks.xml"),
 )
 
 # === Testing ===
