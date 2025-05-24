@@ -10,9 +10,11 @@ bazel_dep(name = "rules_jvm_external", version = "4.0")
 bazel_dep(name = "rules_jvm", version = "0.0.6")
 
 # === Python Dependencies (using pip extension) ===
-# Load and use the pip extension from rules_python
-# The extension name is typically inferred from the bzl filename (pip.bzl -> "pip")
-use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+# Load the pip extension definition
+load("@rules_python//python/extensions:pip.bzl", "pip")
+
+# Use the loaded pip extension, assigning it the handle name "pip"
+use_extension(pip, "pip")
 
 # Call the pip extension to manage Python dependencies
 pip.dependency(
@@ -27,8 +29,11 @@ pip.dependency(
 # For simplicity, relying on auto-detection or default registration provided by rules_python
 
 # === Java Dependencies (using maven extension) ===
-# Load and use the maven extension from rules_jvm_external
-use_extension("@rules_jvm_external//:extension.bzl", "maven") # Check the exact path/name of the extension
+# Load the maven extension definition
+load("@rules_jvm_external//:extension.bzl", "maven") # Check the exact path/name of the extension
+
+# Use the loaded maven extension, assigning it the handle name "maven"
+use_extension(maven, "maven")
 
 # Call the maven extension to fetch Java dependencies
 maven.install(
