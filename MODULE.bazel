@@ -3,64 +3,49 @@
 
 module(name = "dataservice")
 
-# Declare a dependency on Bazel's built-in tools module
-bazel_dep(name = "bazel_tools", version = "6.4.0") # Use a compatible Bazel tools version
-
-# === Python Dependencies ===
-# Declare a dependency on rules_python
+# Declare dependencies on necessary rulesets
+bazel_dep(name = "bazel_tools", version = "7.2.0") # Using a common recent version
 bazel_dep(name = "rules_python", version = "0.28.1")
+bazel_dep(name = "rules_jvm_external", version = "4.0")
+bazel_dep(name = "rules_jvm", version = "0.0.6")
 
-# Load the pip extension from rules_python
-# The syntax for loading extensions is load("<repo_name>//<path_to_extension>", "<extension_name>")
-load("@rules_python//python/extensions:pip.bzl", "pip")
+# === Python Dependencies (using pip extension) ===
+# Load and use the pip extension from rules_python
+# The extension name is typically inferred from the bzl filename (pip.bzl -> "pip")
+use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 
-# Use the pip extension to install Python dependencies from requirements.txt
-pip(name = "python_deps", requirements = "//:requirements.txt")
-
-# Define Python toolchains (usually done after fetching dependencies)
-load("@rules_python//python:toolchains.bzl", "py_runtime_pair")
-
-# Example of defining a Python runtime (adjust version as needed)
-# Referencing the interpreter from the host system
-# Alternatively, you can define a hermetic toolchain if needed.
-# This assumes python3.9 is available in the environment where Bazel runs.
-py_runtime_pair(
-    name = "python3_9",
-    python3_interpreter_path = "/usr/bin/python3.9", # Adjust path to your Python 3.9 interpreter
-    python3_language_version = "3.9",
+# Call the pip extension to manage Python dependencies
+pip.dependency(
+    # Referencing the requirements.txt file in the main repository
+    requirements = "//:requirements.txt",
 )
 
-# Register the defined toolchain
-register_toolchains(":python3_9")
+# Configure and register Python toolchains provided by rules_python
+# rules_python typically auto-registers a toolchain based on your system's Python.
+# If you need a specific version or hermetic toolchain, you would configure it here
+# using the python_register_toolchains extension or similar.
+# For simplicity, relying on auto-detection or default registration provided by rules_python
 
-# === Java Dependencies ===
-# Declare a dependency on rules_jvm_external (for fetching Maven artifacts)
-bazel_dep(name = "rules_jvm_external", version = "4.0")
+# === Java Dependencies (using maven extension) ===
+# Load and use the maven extension from rules_jvm_external
+use_extension("@rules_jvm_external//:extension.bzl", "maven") # Check the exact path/name of the extension
 
-# Load the maven extension from rules_jvm_external
-load("@rules_jvm_external//:deps.bzl", "maven")
-
-# Use the maven extension to fetch Java dependencies
-# The artifacts are declared directly in the maven call in MODULE.bazel
-maven(name = "maven",
+# Call the maven extension to fetch Java dependencies
+maven.install(
     artifacts = [
         "org.liquibase:liquibase-core:4.24.0",
         "org.postgresql:postgresql:42.6.0",
         "com.diffplug.spotless:spotless-plugin-maven:2.43.0",
         "com.google.googlejavaformat:google-java-format:1.17.0",
         "com.puppycrawl.tools:checkstyle:10.12.4",
-        "org.junit.jupiter:junit-jupiter-api:5.10.0", # Add JUnit 5 API
-        "org.junit.jupiter:junit-jupiter-engine:5.10.0", # Add JUnit 5 Engine
-        "org.junit.platform:junit-platform-launcher:1.10.0", # Add JUnit Platform Launcher
+        "org.junit.jupiter:junit-jupiter-api:5.10.0",
+        "org.junit.jupiter:junit-jupiter-engine:5.10.0",
+        "org.junit.platform:junit-platform-launcher:1.10.0",
     ],
     repositories = [
         "https://repo1.maven.org/maven2",
     ],
 )
 
-# Declare a dependency on rules_jvm (for Java build rules like java_test, spotless, checkstyle)
-# Note: rules_jvm often depends on rules_jvm_external internally.
-bazel_dep(name = "rules_jvm", version = "0.0.6") # Use a compatible version
-
-# === Other Potential Dependencies ===
-# If you were using other rulesets (e.g., for Docker, Protobuf), you would declare them here.
+# Note: The artifact() function used in BUILD files still works by referring
+# to artifacts defined in the maven.install call here.
