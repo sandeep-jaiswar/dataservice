@@ -1,0 +1,56 @@
+# This is the MODULE.bazel file for Bzlmod.
+# It declares the module name and its dependencies.
+
+module(name = "dataservice")
+
+# Declare dependencies on necessary rulesets
+bazel_dep(name = "bazel_tools", version = "7.2.0") # Using a common recent version
+bazel_dep(name = "rules_python", version = "0.28.1")
+bazel_dep(name = "rules_jvm_external", version = "4.0")
+bazel_dep(name = "rules_jvm", version = "0.0.6")
+
+# === Python Dependencies (using pip extension) ===
+# Load the pip extension definition
+load("@rules_python//python/extensions:pip.bzl", "pip")
+
+# Use the loaded pip extension, assigning it the handle name "pip"
+use_extension(pip, "pip")
+
+# Call the pip extension to manage Python dependencies
+pip.dependency(
+    # Referencing the requirements.txt file in the main repository
+    requirements = "//:requirements.txt",
+)
+
+# Configure and register Python toolchains provided by rules_python
+# rules_python typically auto-registers a toolchain based on your system's Python.
+# If you need a specific version or hermetic toolchain, you would configure it here
+# using the python_register_toolchains extension or similar.
+# For simplicity, relying on auto-detection or default registration provided by rules_python
+
+# === Java Dependencies (using maven extension) ===
+# Load the maven extension definition
+load("@rules_jvm_external//:extension.bzl", "maven") # Check the exact path/name of the extension
+
+# Use the loaded maven extension, assigning it the handle name "maven"
+use_extension(maven, "maven")
+
+# Call the maven extension to fetch Java dependencies
+maven.install(
+    artifacts = [
+        "org.liquibase:liquibase-core:4.24.0",
+        "org.postgresql:postgresql:42.6.0",
+        "com.diffplug.spotless:spotless-plugin-maven:2.43.0",
+        "com.google.googlejavaformat:google-java-format:1.17.0",
+        "com.puppycrawl.tools:checkstyle:10.12.4",
+        "org.junit.jupiter:junit-jupiter-api:5.10.0",
+        "org.junit.jupiter:junit-jupiter-engine:5.10.0",
+        "org.junit.platform:junit-platform-launcher:1.10.0",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
+
+# Note: The artifact() function used in BUILD files still works by referring
+# to artifacts defined in the maven.install call here.
