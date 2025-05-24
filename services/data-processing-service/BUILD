@@ -1,13 +1,13 @@
 # BUILD file for the data-processing-service
 
-load("@rules_python//python:defs.bzl", "py_library", "py_binary", "py_test")
-load("@python_lint_deps//:requirements.bzl", "requirement")
+load("@rules_python//python/defs:build_defs.bzl", "py_library", "py_binary", "py_test") # Updated load path
+load("@python_deps//:requirements.bzl", "requirement") # Updated load path
 
 py_library(
     name = "data-processing-service-lib",
     srcs = glob(["src/main/python/**/*.py"]),
     deps = [
-        "//pkgs/data_models", # Depends on data models
+        "//pkgs/data_models",
         # Add other dependencies like pandas if used for processing
         # requirement("pandas"),
     ],
@@ -22,7 +22,7 @@ py_binary(
 )
 
 # === Formatting (Black) ===
-load("@python_lint_deps//:black.bzl", "black_fmt")
+load("@python_deps//:black.bzl", "black_fmt") # Updated load path
 
 black_fmt(
     name = "format",
@@ -30,7 +30,7 @@ black_fmt(
 )
 
 # === Linting (Flake8) ===
-load("@python_lint_deps//:flake8.bzl", "flake8_test")
+load("@python_deps//:flake8.bzl", "flake8_test") # Updated load path
 
 flake8_test(
     name = "lint",
@@ -43,6 +43,6 @@ py_test(
     srcs = ["src/test/python/test_processor.py"],
     deps = [
         ":data-processing-service-lib",
-        "//pkgs/data_models", # Tests also depend on data models
+        "//pkgs/data_models",
     ],
 )

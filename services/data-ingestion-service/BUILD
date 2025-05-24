@@ -1,19 +1,16 @@
 # BUILD file for the data-ingestion-service
 
-load("@rules_python//python:defs.bzl", "py_library", "py_binary", "py_test")
-load("@python_lint_deps//:requirements.bzl", "requirement")
+load("@rules_python//python/defs:build_defs.bzl", "py_library", "py_binary", "py_test") # Updated load path
+load("@python_deps//:requirements.bzl", "requirement") # Updated load path to use the pip extension name
 
 # Basic Python library rule for the service logic
 py_library(
     name = "data-ingestion-service-lib",
     srcs = glob(["src/main/python/**/*.py"]),
     deps = [
-        # Add dependencies for HTTP requests (e.g., requests)
         requirement("requests"),
-        # Add dependencies for data processing (e.g., pandas if needed)
-        # requirement("pandas"),
-        "//pkgs/data_models", # Depends on the data models
-        "//pkgs/database_client", # Depends on the database client
+        "//pkgs/data_models",
+        "//pkgs/database_client",
     ],
 )
 
@@ -24,11 +21,12 @@ py_binary(
     deps = [
         ":data-ingestion-service-lib",
     ],
-    data = ["historical_data_sample.json"], # Add the JSON file as a data dependency
+    data = ["historical_data_sample.json"],
 )
 
 # === Formatting (Black) ===
-load("@python_lint_deps//:black.bzl", "black_fmt")
+# Load black from the python_deps module
+load("@python_deps//:black.bzl", "black_fmt") # Updated load path
 
 black_fmt(
     name = "format",
@@ -36,7 +34,8 @@ black_fmt(
 )
 
 # === Linting (Flake8) ===
-load("@python_lint_deps//:flake8.bzl", "flake8_test")
+# Load flake8 from the python_deps module
+load("@python_deps//:flake8.bzl", "flake8_test") # Updated load path
 
 flake8_test(
     name = "lint",
@@ -60,7 +59,7 @@ py_test(
         ":data-ingestion-service-lib",
         "//pkgs/data_models",
     ],
-    data = ["historical_data_sample.json"], # The test also needs the JSON file
+    data = ["historical_data_sample.json"],
 )
 
 py_test(
@@ -68,8 +67,8 @@ py_test(
     srcs = ["src/test/python/integration_test.py"],
     deps = [
         ":data-ingestion-service-lib",
-        "//pkgs/database_client", # Depends on the database client
-        "//pkgs/data_models", # Depends on data models
+        "//pkgs/database_client",
+        "//pkgs/data_models",
     ],
-    data = ["historical_data_sample.json"], # The test needs the JSON file
+    data = ["historical_data_sample.json"],
 )

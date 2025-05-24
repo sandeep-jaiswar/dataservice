@@ -1,6 +1,66 @@
-###############################################################################
-# Bazel now uses Bzlmod by default to manage external dependencies.
-# Please consider migrating your external dependencies from WORKSPACE to MODULE.bazel.
-#
-# For more details, please check https://github.com/bazelbuild/bazel/issues/18958
-###############################################################################
+# This is the MODULE.bazel file for Bzlmod.
+# It declares the module name and its dependencies.
+
+module(name = "dataservice")
+
+# Declare a dependency on Bazel's built-in tools module
+bazel_dep(name = "bazel_tools", version = "6.4.0") # Use a compatible Bazel tools version
+
+# === Python Dependencies ===
+# Declare a dependency on rules_python
+bazel_dep(name = "rules_python", version = "0.28.1")
+
+# Load the pip extension from rules_python
+# The syntax for loading extensions is load("<repo_name>//<path_to_extension>", "<extension_name>")
+load("@rules_python//python/extensions:pip.bzl", "pip")
+
+# Use the pip extension to install Python dependencies from requirements.txt
+pip(name = "python_deps", requirements = "//:requirements.txt")
+
+# Define Python toolchains (usually done after fetching dependencies)
+load("@rules_python//python:toolchains.bzl", "py_runtime_pair")
+
+# Example of defining a Python runtime (adjust version as needed)
+# Referencing the interpreter from the host system
+# Alternatively, you can define a hermetic toolchain if needed.
+# This assumes python3.9 is available in the environment where Bazel runs.
+py_runtime_pair(
+    name = "python3_9",
+    python3_interpreter_path = "/usr/bin/python3.9", # Adjust path to your Python 3.9 interpreter
+    python3_language_version = "3.9",
+)
+
+# Register the defined toolchain
+register_toolchains(":python3_9")
+
+# === Java Dependencies ===
+# Declare a dependency on rules_jvm_external (for fetching Maven artifacts)
+bazel_dep(name = "rules_jvm_external", version = "4.0")
+
+# Load the maven extension from rules_jvm_external
+load("@rules_jvm_external//:deps.bzl", "maven")
+
+# Use the maven extension to fetch Java dependencies
+# The artifacts are declared directly in the maven call in MODULE.bazel
+maven(name = "maven",
+    artifacts = [
+        "org.liquibase:liquibase-core:4.24.0",
+        "org.postgresql:postgresql:42.6.0",
+        "com.diffplug.spotless:spotless-plugin-maven:2.43.0",
+        "com.google.googlejavaformat:google-java-format:1.17.0",
+        "com.puppycrawl.tools:checkstyle:10.12.4",
+        "org.junit.jupiter:junit-jupiter-api:5.10.0", # Add JUnit 5 API
+        "org.junit.jupiter:junit-jupiter-engine:5.10.0", # Add JUnit 5 Engine
+        "org.junit.platform:junit-platform-launcher:1.10.0", # Add JUnit Platform Launcher
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
+
+# Declare a dependency on rules_jvm (for Java build rules like java_test, spotless, checkstyle)
+# Note: rules_jvm often depends on rules_jvm_external internally.
+bazel_dep(name = "rules_jvm", version = "0.0.6") # Use a compatible version
+
+# === Other Potential Dependencies ===
+# If you were using other rulesets (e.g., for Docker, Protobuf), you would declare them here.

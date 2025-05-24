@@ -1,14 +1,14 @@
 # BUILD file for pkgs/database_client
 
-load("@rules_python//python:defs.bzl", "py_library", "py_test")
-load("@python_lint_deps//:requirements.bzl", "requirement")
+load("@rules_python//python/defs:build_defs.bzl", "py_library", "py_test") # Updated load path
+load("@python_deps//:requirements.bzl", "requirement") # Updated load path to use the pip extension name
 
 py_library(
     name = "database_client",
     srcs = glob(["src/main/python/**/*.py"]),
     deps = [
-        "//pkgs/data_models", # Depends on the data models
-        requirement("psycopg2-binary"), # Depends on psycopg2
+        "//pkgs/data_models",
+        requirement("psycopg2-binary"),
     ],
     visibility = [
         "//services/data-ingestion-service:__subpackages__",
@@ -19,7 +19,7 @@ py_library(
 )
 
 # === Formatting (Black) ===
-load("@python_lint_deps//:black.bzl", "black_fmt")
+load("@python_deps//:black.bzl", "black_fmt") # Updated load path
 
 black_fmt(
     name = "format",
@@ -27,7 +27,7 @@ black_fmt(
 )
 
 # === Linting (Flake8) ===
-load("@python_lint_deps//:flake8.bzl", "flake8_test")
+load("@python_deps//:flake8.bzl", "flake8_test") # Updated load path
 
 flake8_test(
     name = "lint",
@@ -39,7 +39,6 @@ py_test(
     name = "database_client_test",
     srcs = ["src/test/python/test_database_client.py"],
     deps = [
-        ":database_client", # The test depends on the database_client library
-        # Mocking is part of standard Python libraries, so no extra deps needed for mock.
+        ":database_client",
     ],
 )

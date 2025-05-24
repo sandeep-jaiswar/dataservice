@@ -1,7 +1,7 @@
 # BUILD file for the database-service
 
-load("@rules_jvm//java:defs.bzl", "java_library", "java_binary", "java_test")
-load("@maven//:defs.bzl", "artifact")
+load("@rules_jvm//java:defs.bzl", "java_library", "java_binary", "java_test") # Updated load path
+load("@maven//:defs.bzl", "artifact") # Load artifact from the maven extension
 
 # Basic Java library rule
 java_library(
@@ -24,7 +24,7 @@ java_library(
 # )
 
 # === Formatting (Spotless with Google Java Format) ===
-load("@rules_jvm//java/fmt:spotless.bzl", "spotless_java_fmt")
+load("@rules_jvm//java/fmt:spotless.bzl", "spotless_java_fmt") # Updated load path
 
 spotless_java_fmt(
     name = "format",
@@ -36,23 +36,24 @@ spotless_java_fmt(
 )
 
 # === Linting (Checkstyle) ===
-load("@rules_jvm//java/lint:checkstyle.bzl", "checkstyle_java_lint")
+load("@rules_jvm//java/lint:checkstyle.bzl", "checkstyle_java_lint") # Updated load path
 
 checkstyle_java_lint(
     name = "lint",
     srcs = glob(["src/main/java/**/*.java"]),
     checkstyle = artifact("com.puppycrawl.tools:checkstyle"),
-    # Reference the Google checks configuration within the checkstyle artifact
     config = artifact("com.puppycrawl.tools:checkstyle", path = "google_checks.xml"),
 )
 
 # === Testing ===
+load("@rules_jvm//java:defs.bzl", "java_test") # Ensure java_test is loaded from rules_jvm
+
 java_test(
     name = "database_service_test",
     srcs = glob(["src/test/java/**/*.java"]),
     deps = [
         ":database-service-lib",
-        artifact("org.junit.jupiter:junit-jupiter-api"),
+        artifact("org.junit.jupiter:junit-jupiter-api"), # These dependencies are now fetched via Bzlmod/maven
         artifact("org.junit.jupiter:junit-jupiter-engine"),
     ],
     runtime_deps = [
