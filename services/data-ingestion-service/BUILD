@@ -1,6 +1,6 @@
 # BUILD file for the data-ingestion-service
 
-load("@rules_python//python:defs.bzl", "py_library", "py_binary")
+load("@rules_python//python:defs.bzl", "py_library", "py_binary", "py_test")
 load("@python_lint_deps//:requirements.bzl", "requirement")
 
 # Basic Python library rule for the service logic
@@ -19,7 +19,7 @@ py_library(
 # Example for a binary that runs the service
 py_binary(
     name = "data-ingestion-service",
-    srcs = ["src/main/python/main.py"], # Your main entry point
+    srcs = ["src/main/python/main.py"],
     deps = [
         ":data-ingestion-service-lib",
     ],
@@ -39,4 +39,13 @@ load("@python_lint_deps//:flake8.bzl", "flake8_test")
 flake8_test(
     name = "lint",
     srcs = glob(["src/main/python/**/*.py"]),
+)
+
+# === Testing ===
+py_test(
+    name = "nse_symbols_test",
+    srcs = ["src/test/python/test_nse_symbols.py"],
+    deps = [
+        ":data-ingestion-service-lib", # The test depends on the library it's testing
+    ],
 )
