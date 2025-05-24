@@ -1,0 +1,12 @@
+# Ignore common build and development files
+.bazel*
+*.pyc
+__pycache__/
+.vscode/
+.idea/
+build/
+dist/
+*.egg-info/
+venv/
+.nix-profile/
+result
